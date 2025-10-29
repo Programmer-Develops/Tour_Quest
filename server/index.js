@@ -2,8 +2,11 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import dotenv from 'dotenv';
 
 import postRoutes from './routes/posts.js';
+
+dotenv.config();
 
 const app = express();
 
@@ -13,8 +16,8 @@ app.use(cors());
 
 app.use('/posts', postRoutes);
 
-const CONNECTION_URL = 'mongodb+srv://shantanu-pandya:EZeS4SxeU6LgOhSB@cluster0.bc4iqte.mongodb.net/?appName=Cluster0';
-const PORT = process.env.PORT|| 5000;
+const CONNECTION_URL = process.env.MONGODB_URI;
+const PORT = process.env.PORT || 5000;
 
 mongoose.connect(CONNECTION_URL)
   .then(() => app.listen(PORT, () => console.log(`Server Running on Port: http://localhost:${PORT}`)))
