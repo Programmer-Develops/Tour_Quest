@@ -14,7 +14,6 @@ import { useNavigate } from 'react-router-dom';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { jwtDecode } from 'jwt-decode';
-
 import { signin, signup } from '../../actions/auth';
 import { AUTH } from '../../constants/actionTypes';
 import Input from './Input';
@@ -78,7 +77,7 @@ const Auth = () => {
   };
 
   return (
-    <GoogleOAuthProvider clientId="424786950941-qch4e23cs0h4ftmdhrtu4aiv139o219a.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_CLIENT_ID}>
       <Container component="main" maxWidth="xs">
         <Box
           sx={{
@@ -197,6 +196,7 @@ const Auth = () => {
                   px: 2,
                   bgcolor: 'background.paper',
                   color: 'text.secondary',
+                  marginTop: '-22px',
                 }}
               >
                 OR

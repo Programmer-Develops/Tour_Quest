@@ -42,17 +42,16 @@ const Form = ({ currentId, setCurrentId }) => {
     if (post) setPostData(post);
   }, [post]);
 
+  // THIS IS THE NEW, CORRECT CODE
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (currentId) {
-      dispatch(
-        updatePost(currentId, { ...postData, name: user?.result?.name })
-      );
+      // Also add the name to updated posts
+      dispatch(updatePost(currentId, { ...postData, name: user?.result?.name }));
     } else {
-      dispatch(
-        createPost({ ...postData, name: user?.result?.name }, navigate)
-      );
+      // Add the user's name when creating a post
+      dispatch(createPost({ ...postData, name: user?.result?.name }, navigate));
     }
     clear();
   };
@@ -137,7 +136,7 @@ const Form = ({ currentId, setCurrentId }) => {
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
               <Chip
-                key={index}
+                // key={index}
                 label={option}
                 size="small"
                 color="primary"

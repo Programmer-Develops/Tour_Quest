@@ -28,6 +28,8 @@ const Post = ({ post, setCurrentId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // --- FIX 1: Reverted to check for BOTH Google ID and database _id ---
+  // This gets the correct ID for the logged-in user, regardless of auth type.
   const userId = user?.result?.googleId || user?.result?._id;
   const hasLikedPost = likes.some((like) => like === userId);
 
@@ -97,7 +99,7 @@ const Post = ({ post, setCurrentId }) => {
         }}
       >
         <CardMedia
-          component="img"
+          // component="img"
           image={
             post.selectedFile ||
             'https://user-images.githubusercontent.com/194400/49531010-48dad180-f8b1-11e8-8d89-1e61320e1d82.png'
@@ -128,9 +130,10 @@ const Post = ({ post, setCurrentId }) => {
           </Typography>
         </Box>
 
-        {/* Edit Button (for creator only) */}
-        {(user?.result?.googleId === post?.creator ||
-          user?.result?._id === post?.creator) && (
+        {/* --- FIX 2: Check logged-in user's ID against the post creator --- */}
+        {/* 'userId' (from line 30) is the logged-in user's ID (Google or custom) */}
+        {/* 'post.creator' is the ID of the person who made the post */}
+        {userId === post?.creator && (
           <Box
             sx={{
               position: 'absolute',
@@ -211,8 +214,8 @@ const Post = ({ post, setCurrentId }) => {
           startIcon={<Likes />}
         />
 
-        {(user?.result?.googleId === post?.creator ||
-          user?.result?._id === post?.creator) && (
+        {/* --- FIX 3: Same logic for the Delete button --- */}
+        {userId === post?.creator && (
           <Button
             size="small"
             color="secondary"

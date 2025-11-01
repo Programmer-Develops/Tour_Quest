@@ -14,6 +14,7 @@ import { commentPost } from '../../actions/posts';
 const CommentSection = ({ post }) => {
   const user = JSON.parse(localStorage.getItem('profile'));
   const [comment, setComment] = useState('');
+  // 1. We use a local state to store and show the comments.
   const [comments, setComments] = useState(post?.comments || []);
   const dispatch = useDispatch();
   const commentsRef = useRef();
@@ -22,15 +23,22 @@ const CommentSection = ({ post }) => {
     if (!comment.trim() || !user) return;
 
     const finalComment = `${user?.result?.name}: ${comment}`;
-    const newComments = await dispatch(commentPost(finalComment, post._id));
+    
+    try {
+      const newComments = await dispatch(commentPost(finalComment, post._id));
 
-    setComments(newComments);
-    setComment('');
+      if (newComments) {
+        setComments(newComments);
+        setComment(''); 
+      }
+      
+      setTimeout(() => {
+        commentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
 
-    // Smooth scroll to latest comment
-    setTimeout(() => {
-      commentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 100);
+    } catch (error) {
+      console.log("Error in handleComment:", error);
+    }
   };
 
   return (
@@ -43,7 +51,6 @@ const CommentSection = ({ post }) => {
           mt: 2,
         }}
       >
-        {/* Comments List */}
         <Box sx={{ flex: 1, maxHeight: 400, overflow: 'auto', pr: 1 }}>
           <Typography gutterBottom variant="h6">
             Comments
@@ -78,7 +85,6 @@ const CommentSection = ({ post }) => {
           </Stack>
         </Box>
 
-        {/* Write Comment */}
         <Box sx={{ width: { xs: '100%', md: '70%' } }}>
           <Typography gutterBottom variant="h6">
             Write a comment

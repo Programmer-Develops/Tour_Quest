@@ -49,14 +49,14 @@ export const getPostsBySearch = (searchQuery) => async (dispatch) => {
   }
 };
 
-export const createPost = (post, history) => async (dispatch) => {
+export const createPost = (post, navigate) => async (dispatch) => {
   try {
     dispatch({ type: START_LOADING });
     const { data } = await api.createPost(post);
 
     dispatch({ type: CREATE, payload: data });
 
-    history.push(`/posts/${data._id}`);
+    navigate(`/posts/${data._id}`); 
   } catch (error) {
     console.log(error);
   }
@@ -86,19 +86,30 @@ export const likePost = (id) => async (dispatch) => {
 
 export const commentPost = (value, id) => async (dispatch) => {
   try {
-    const { data } = await api.comment(value, id);
+    // This 'data' is the full, updated post { _id: ..., comments: [...] }
+    const { data } = await api.comment(value, id); 
 
+    // Dispatch the action to update the Redux store
     dispatch({ type: COMMENT, payload: data });
 
-    return data.comments;
+    // This is what your component is waiting for:
+    return data.comments; 
+
   } catch (error) {
-    console.log(error);
+
+    console.log("ERROR in commentPost action:", error);
+
+    // We can check the error response from the server
+    if (error.response) {
+      console.log("Server responded with:", error.response.data);
+      console.log("Status code:", error.response.status);
+    }
   }
 };
 
 export const deletePost = (id) => async (dispatch) => {
   try {
-    await await api.deletePost(id);
+    await api.deletePost(id);
 
     dispatch({ type: DELETE, payload: id });
   } catch (error) {
