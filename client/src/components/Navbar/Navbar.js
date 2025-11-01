@@ -25,10 +25,12 @@ const Navbar = () => {
     navigate('/auth');
   }, [dispatch, navigate]);
 
+  // Sync user with Redux state
   useEffect(() => {
     setUser(authData);
   }, [authData]);
 
+  // Check token expiration
   useEffect(() => {
     const token = user?.token;
     if (token) {
@@ -42,7 +44,7 @@ const Navbar = () => {
         logout();
       }
     }
-  }, [user?.token, logout]);
+  }, [user?.token, logout]); // ← Only these deps
 
   return (
     <AppBar
@@ -57,12 +59,10 @@ const Navbar = () => {
         boxShadow: 1,
       }}
     >
-      {/* Logo */}
       <Box component={Link} to="/" sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
         <Box component="img" src={tour} alt="Tour Quest" sx={{ height: 40, ml: { xs: 0, sm: 1 } }} />
       </Box>
 
-      {/* User */}
       <Box>
         {user?.result ? (
           <Stack direction="row" alignItems="center" spacing={2} sx={{ pr: { xs: 0, sm: 2 } }}>
@@ -76,12 +76,12 @@ const Navbar = () => {
             <Typography variant="h6" sx={{ display: { xs: 'none', sm: 'block' }, fontWeight: 500 }}>
               {user.result.name}
             </Typography>
-            <Button variant="contained" color="secondary" onClick={logout} size="small">
+            <Button variant="contained" color="secondary" onClick={logout} size="small" sx={{ textTransform: 'none' }}>
               Logout
             </Button>
           </Stack>
         ) : (
-          <Button component={Link} to="/auth" variant="contained" color="primary" size="small">
+          <Button component={Link} to="/auth" variant="contained" color="primary" size="small" sx={{ textTransform: 'none' }}>
             Sign In
           </Button>
         )}

@@ -1,4 +1,3 @@
-// src/pages/Home/Home.js
 import React, { useState } from 'react';
 import {
   Container,
@@ -31,7 +30,7 @@ const Home = () => {
   const searchQuery = query.get('searchQuery');
 
   const [currentId, setCurrentId] = useState(null);
-  const { authData } = useSelector((state) => state.auth);
+  const { authData } = useSelector((state) => state.auth); // ← ADD THIS
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -52,55 +51,52 @@ const Home = () => {
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') searchPost();
   };
-
+  console.log('Auth Data:', useSelector(state => state.auth));
   return (
     <Grow in>
-      <Container maxWidth="xl">
-        {/* Full-height wrapper so the sidebar stretches to the bottom */}
+      <Container maxWidth="xl" sx={{ pt: { xs: 9, sm: 10 } }}>
         <Grid
           container
           spacing={3}
           sx={{
             flexDirection: { xs: 'column-reverse', md: 'row' },
-            minHeight: 'calc(100vh - 64px)', // 64px = navbar height
+            minHeight: 'calc(100vh - 128px)',
           }}
         >
-          {/* ---------- Posts ---------- */}
           <Grid item xs={12} md={9}>
             <Posts setCurrentId={setCurrentId} />
           </Grid>
 
-          {/* ---------- Sidebar ---------- */}
           <Grid item xs={12} md={3}>
             <Stack
               spacing={3}
               sx={{
-                height: '100%',               // fill the grid cell
-                justifyContent: 'flex-start', // keep everything at top
+                height: '100%',
+                justifyContent: 'flex-start',
               }}
             >
               <AppBar
                 position="sticky"
                 color="inherit"
                 sx={{
-                  top: 0,
+                  top: { xs: 64, sm: 72 },
                   borderRadius: 3,
                   p: 2,
                   bgcolor: 'background.paper',
                   boxShadow: 2,
+                  zIndex: (theme) => theme.zIndex.appBar - 1,
                 }}
               >
                 <TextField
                   name="search"
                   variant="outlined"
-                  label="Search guides"
+                  label="Search tour guides"
                   fullWidth
                   size="small"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={handleKeyPress}
                 />
-
                 <Autocomplete
                   multiple
                   freeSolo
@@ -131,7 +127,6 @@ const Home = () => {
                     />
                   )}
                 />
-
                 <Button
                   onClick={searchPost}
                   variant="contained"
@@ -143,20 +138,12 @@ const Home = () => {
                 </Button>
               </AppBar>
 
-              {authData && (
-                <Form currentId={currentId} setCurrentId={setCurrentId} />
-              )}
+              {/* Form - Only if logged in */}
+              {authData && <Form currentId={currentId} setCurrentId={setCurrentId} />}
 
               <Box sx={{ mt: 'auto' }}>
                 {!searchQuery && tags.length === 0 && (
-                  <Paper
-                    elevation={6}
-                    sx={{
-                      borderRadius: 3,
-                      p: 1,
-                      bgcolor: 'background.paper',
-                    }}
-                  >
+                  <Paper elevation={6} sx={{ borderRadius: 3, p: 1, bgcolor: 'background.paper' }}>
                     <Pagination page={page} />
                   </Paper>
                 )}

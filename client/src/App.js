@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container } from '@mui/material';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux'; // ← ADD THIS
 
 import PostDetails from './components/PostDetails/PostDetails';
 import Navbar from './components/Navbar/Navbar';
@@ -9,7 +10,7 @@ import Auth from './components/Auth/Auth';
 import CreatorOrTag from './components/CreatorOrTag/CreatorOrTag';
 
 const App = () => {
-  const user = JSON.parse(localStorage.getItem('profile'));
+  const { authData } = useSelector((state) => state.auth); // ← READ FROM REDUX
 
   return (
     <BrowserRouter>
@@ -30,11 +31,10 @@ const App = () => {
           <Route path="/creators/:name" element={<CreatorOrTag />} />
           <Route path="/tags/:name" element={<CreatorOrTag />} />
 
+          {/* Auth Guard */}
           <Route
             path="/auth"
-            element={
-              !user ? <Auth /> : <Navigate to="/posts" replace />
-            }
+            element={authData ? <Navigate to="/posts" replace /> : <Auth />}
           />
         </Routes>
       </Container>

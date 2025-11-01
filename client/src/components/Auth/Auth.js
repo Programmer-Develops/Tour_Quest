@@ -13,7 +13,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import GoogleIcon from '@mui/icons-material/Google';
+import { jwtDecode } from 'jwt-decode';
 
 import { signin, signup } from '../../actions/auth';
 import { AUTH } from '../../constants/actionTypes';
@@ -34,7 +34,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleShowPassword = () => setShowPassword(!showPassword);
+  const handleShowPassword = () => setShowPassword((prev) => !prev);
 
   const switchMode = () => {
     setForm(initialState);
@@ -57,16 +57,16 @@ const Auth = () => {
   const googleSuccess = (credentialResponse) => {
     try {
       const token = credentialResponse.credential;
-      const decoded = JSON.parse(atob(token.split('.')[1]));
+      const result = jwtDecode(token); 
 
-      const result = {
-        googleId: decoded.sub,
-        name: decoded.name,
-        email: decoded.email,
-        imageUrl: decoded.picture,
+      const profile = {
+        googleId: result.sub,
+        name: result.name,
+        email: result.email,
+        imageUrl: result.picture,
       };
 
-      dispatch({ type: AUTH, data: { result, token } });
+      dispatch({ type: AUTH, data: { result: profile, token } });
       navigate('/');
     } catch (error) {
       console.error('Google login failed:', error);
@@ -88,19 +88,14 @@ const Auth = () => {
             alignItems: 'center',
           }}
         >
-          <Avatar
-            sx={{
-              m: 1,
-              bgcolor: 'primary.main',
-            }}
-          >
+          <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
-          
+
           <Typography component="h1" variant="h5">
             {isSignup ? 'Sign Up' : 'Sign In'}
           </Typography>
-          
+
           <Paper
             component="form"
             onSubmit={handleSubmit}
@@ -208,6 +203,7 @@ const Auth = () => {
               </Typography>
             </Box>
 
+            {/* Google Login Button */}
             <GoogleLogin
               onSuccess={googleSuccess}
               onError={googleError}
@@ -216,45 +212,13 @@ const Auth = () => {
               text="signin_with"
               shape="rectangular"
               width="100%"
-              render={(renderProps) => (
-                <Button
-                  onClick={renderProps.onClick}
-                  disabled={renderProps.disabled}
-                  variant="outlined"
-                  fullWidth
-                  startIcon={<GoogleIcon />}
-                  sx={{
-                    py: 1.5,
-                    borderColor: 'grey.300',
-                    color: 'text.primary',
-                    '&:hover': {
-                      borderColor: 'grey.400',
-                      bgcolor: 'grey.50',
-                    },
-                  }}
-                >
-                  Continue with Google
-                </Button>
-              )}
             />
 
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              sx={{ mt: 2 }}
-            >
-              <Button
-                size="small"
-                color="primary"
-                onClick={() => navigate('/posts')}
-              >
+            <Stack direction="row" justifyContent="space-between" sx={{ mt: 2 }}>
+              <Button size="small" color="primary" onClick={() => navigate('/posts')}>
                 Back to Posts
               </Button>
-              <Button
-                size="small"
-                color="primary"
-                onClick={switchMode}
-              >
+              <Button size="small" color="primary" onClick={switchMode}>
                 {isSignup
                   ? 'Already have an account? Sign in'
                   : "Don't have an account? Sign Up"}
