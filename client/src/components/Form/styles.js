@@ -1,14 +1,14 @@
 
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/material/styles';
 
-export default makeStyles(() => ({
+export default makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
-      margin: '0.25rem', // Equivalent to theme.spacing(1)
+      margin: theme.spacing(1),
     },
   },
   paper: {
-    padding: '0.5rem', // Equivalent to theme.spacing(2)
+    padding: theme.spacing(2),
   },
   form: {
     display: 'flex',

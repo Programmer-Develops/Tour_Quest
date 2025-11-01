@@ -1,50 +1,209 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Typography, Paper } from '@mui/material';
+import {
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  Autocomplete,
+  Chip,
+  Box,
+  Stack,
+} from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import FileBase64 from '../FileBase64/FileBase64';
+import FileBase from 'react-file-base64';
+import { useNavigate } from 'react-router-dom';
 
-import useStyles from './styles';
 import { createPost, updatePost } from '../../actions/posts';
 
 const Form = ({ currentId, setCurrentId }) => {
-  const [postData, setPostData] = useState({ creator: '', title: '', message: '', tags: '', selectedFile: '' });
-  const post = useSelector((state) => (currentId ? state.posts.find((message) => message._id === currentId) : null));
+  const [postData, setPostData] = useState({
+    title: '',
+    message: '',
+    tags: [],
+    selectedFile: '',
+  });
+
+  const post = useSelector((state) =>
+    currentId
+      ? state.posts.posts.find((p) => p._id === currentId)
+      : null
+  );
+
   const dispatch = useDispatch();
-  const classes = useStyles();
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem('profile'));
+
+  const clear = () => {
+    setCurrentId(null);
+    setPostData({ title: '', message: '', tags: [], selectedFile: '' });
+  };
 
   useEffect(() => {
     if (post) setPostData(post);
   }, [post]);
 
-  const clear = () => {
-    setCurrentId(0);
-    setPostData({ creator: '', title: '', message: '', tags: '', selectedFile: '' });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (currentId === 0) {
-      dispatch(createPost(postData));
-      clear();
+    if (currentId) {
+      dispatch(
+        updatePost(currentId, { ...postData, name: user?.result?.name })
+      );
     } else {
-      dispatch(updatePost(currentId, postData));
-      clear();
+      dispatch(
+        createPost({ ...postData, name: user?.result?.name }, navigate)
+      );
     }
+    clear();
   };
 
+  if (!user?.result?.name) {
+    return (
+      <Paper
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          textAlign: 'center',
+          bgcolor: 'background.paper',
+        }}
+        elevation={6}
+      >
+        <Typography variant="h6" color="text.secondary">
+          Please Sign In to create your tour guides and like other's tour guides.
+        </Typography>
+      </Paper>
+    );
+  }
+
   return (
-    <Paper className={classes.paper}>
-      <form autoComplete="off" noValidate className={`${classes.root} ${classes.form}`} onSubmit={handleSubmit}>
-        <Typography variant="h6">{currentId ? `Editing "${post.title}"` : 'Create a tour guide'}</Typography>
-        <TextField name="creator" variant="outlined" label="Creator" fullWidth value={postData.creator} onChange={(e) => setPostData({ ...postData, creator: e.target.value })} />
-        <TextField name="title" variant="outlined" label="Title" fullWidth value={postData.title} onChange={(e) => setPostData({ ...postData, title: e.target.value })} />
-        <TextField name="message" variant="outlined" label="Message" fullWidth multiline rows={4} value={postData.message} onChange={(e) => setPostData({ ...postData, message: e.target.value })} />
-        <TextField name="tags" variant="outlined" label="Tags (coma separated)" fullWidth value={postData.tags} onChange={(e) => setPostData({ ...postData, tags: e.target.value.split(',') })} />
-        <div className={classes.fileInput}><FileBase64 multiple={false} onDone={({ base64 }) => setPostData({ ...postData, selectedFile: base64 })} /></div>
-        <Button className={classes.buttonSubmit} variant="contained" color="primary" size="large" type="submit" fullWidth>Submit</Button>
-        <Button variant="contained" color="secondary" size="small" onClick={clear} fullWidth>Clear</Button>
-      </form>
+    <Paper
+      sx={{
+        p: { xs: 2, sm: 3 },
+        borderRadius: 3,
+        bgcolor: 'background.paper',
+      }}
+      elevation={6}
+    >
+      <Box
+        component="form"
+        autoComplete="off"
+        noValidate
+        onSubmit={handleSubmit}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
+        <Typography variant="h6" fontWeight="bold">
+          {currentId ? `Editing "${post?.title}"` : 'Creating a guide'}
+        </Typography>
+
+        <TextField
+          name="title"
+          variant="outlined"
+          label="Title"
+          fullWidth
+          value={postData.title}
+          onChange={(e) =>
+            setPostData({ ...postData, title: e.target.value })
+          }
+          size="small"
+        />
+
+        <TextField
+          name="message"
+          variant="outlined"
+          label="Message"
+          fullWidth
+          multiline
+          rows={4}
+          value={postData.message}
+          onChange={(e) =>
+            setPostData({ ...postData, message: e.target.value })
+          }
+          size="small"
+        />
+
+        {/* Tags Input */}
+        <Autocomplete
+          multiple
+          freeSolo
+          options={[]}
+          value={postData.tags}
+          onChange={(event, newValue) => {
+            setPostData({ ...postData, tags: newValue });
+          }}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              <Chip
+                key={index}
+                label={option}
+                size="small"
+                color="primary"
+                {...getTagProps({ index })}
+                sx={{ mr: 0.5 }}
+              />
+            ))
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              variant="outlined"
+              label="Tags"
+              placeholder="Type tag and press Enter..."
+              fullWidth
+              size="small"
+            />
+          )}
+        />
+
+        {/* File Upload */}
+        <Box
+          sx={{
+            p: 2,
+            border: '2px dashed',
+            borderColor: 'grey.300',
+            borderRadius: 2,
+            textAlign: 'center',
+            bgcolor: 'grey.50',
+            '&:hover': {
+              borderColor: 'primary.main',
+              bgcolor: 'grey.100',
+            },
+          }}
+        >
+          <FileBase
+            type="file"
+            multiple={false}
+            onDone={({ base64 }) =>
+              setPostData({ ...postData, selectedFile: base64 })
+            }
+          />
+        </Box>
+
+        {/* Buttons */}
+        <Stack direction="row" spacing={1}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            type="submit"
+            fullWidth
+          >
+            Submit
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="large"
+            onClick={clear}
+            fullWidth
+          >
+            Clear
+          </Button>
+        </Stack>
+      </Box>
     </Paper>
   );
 };
