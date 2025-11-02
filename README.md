@@ -44,15 +44,6 @@ A full-stack **tour guide platform** where travelers share real experiences, hid
 
 ---
 
-### Screenshots
-
-<div align="center">
-  <img src="https://via.placeholder.com/800x450?text=Home+Page" alt="Home Page" width="48%" />
-  <img src="https://via.placeholder.com/800x450?text=Create+Tour" alt="Create Tour" width="48%" />
-</div>
-
----
-
 ### Team: Tech Square
 
 > _"Man cannot discover new oceans unless he has the courage to lose sight of the shore."_  
