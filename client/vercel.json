@@ -14,9 +14,5 @@
       "src": "/(.*)",
       "dest": "/build/index.html"
     }
-  ],
-  "env": {
-    "REACT_APP_API_URL": "https://tour-quest.onrender.com/",
-    "REACT_APP_GOOGLE_CLIENT_ID": "424786950941-qch4e23cs0h4ftmdhrtu4aiv139o219a.apps.googleusercontent.com"
-  }
+  ]
 }
