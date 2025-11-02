@@ -1,26 +1,25 @@
 import mongoose from 'mongoose';
 
 const postSchema = mongoose.Schema({
-    title: String,
-    message: String,
-    name: String,
-    creator: String,
-    tags: [String],
-    selectedFile: String,
-    likeCount: {
-        type: Number,
-        default: 0,
-    },
-    isLiked: {
-        type: Boolean,
-        default: false,
-    },
-    createdAt: {
-        type: Date,
-        default: new Date(),
-    },
-})
+  title: String,
+  message: String,
+  name: String,
+  creator: String,
+  tags: [String],
+  selectedFile: String,
 
-var PostMessage = mongoose.model('PostMessage', postSchema);
+  // REPLACE likeCount & isLiked with:
+  likes: {
+    type: [String], // Array of user IDs (Google ID or Mongo _id)
+    default: [],
+  },
+
+  createdAt: {
+    type: Date,
+    default: new Date(),
+  },
+});
+
+const PostMessage = mongoose.model('PostMessage', postSchema);
 
 export default PostMessage;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Card,
   CardActions,
@@ -8,7 +8,6 @@ import {
   Typography,
   ButtonBase,
   Box,
-  // Stack,
 } from '@mui/material';
 import {
   ThumbUpAlt as ThumbUpAltIcon,
@@ -23,35 +22,27 @@ import moment from 'moment';
 import { likePost, deletePost } from '../../../actions/posts';
 
 const Post = ({ post, setCurrentId }) => {
-  const user = JSON.parse(localStorage.getItem('profile'));
-  const [likes, setLikes] = useState(post?.likes || []);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  // --- FIX 1: Reverted to check for BOTH Google ID and database _id ---
-  // This gets the correct ID for the logged-in user, regardless of auth type.
+  const user = JSON.parse(localStorage.getItem('profile'));
   const userId = user?.result?.googleId || user?.result?._id;
-  const hasLikedPost = likes.some((like) => like === userId);
 
-  const handleLike = async () => {
-    dispatch(likePost(post._id));
+  // SAFE: Always an array
+  const likes = Array.isArray(post.likes) ? post.likes : [];
+  const hasLiked = likes.includes(userId);
 
-    if (hasLikedPost) {
-      setLikes(likes.filter((id) => id !== userId));
-    } else {
-      setLikes([...likes, userId]);
+  const handleLike = () => {
+    if (user?.token) {
+      dispatch(likePost(post._id));
     }
   };
 
   const Likes = () => {
     if (likes.length > 0) {
-      return hasLikedPost ? (
+      return hasLiked ? (
         <>
           <ThumbUpAltIcon fontSize="small" />
-          &nbsp;
-          {likes.length > 2
-            ? `You and ${likes.length - 1} others`
-            : `${likes.length} like${likes.length > 1 ? 's' : ''}`}
+          &nbsp;{likes.length > 2 ? `You and ${likes.length - 1} others` : `${likes.length} like${likes.length > 1 ? 's' : ''}`}
         </>
       ) : (
         <>
@@ -60,7 +51,6 @@ const Post = ({ post, setCurrentId }) => {
         </>
       );
     }
-
     return (
       <>
         <ThumbUpAltOutlined fontSize="small" />
@@ -83,23 +73,16 @@ const Post = ({ post, setCurrentId }) => {
         position: 'relative',
         overflow: 'hidden',
         transition: '0.3s',
-        '&:hover': {
-          boxShadow: 6,
-        },
+        '&:hover': { boxShadow: 6 },
       }}
       raised
       elevation={6}
     >
       <ButtonBase
         onClick={openPost}
-        sx={{
-          display: 'block',
-          textAlign: 'initial',
-          width: '100%',
-        }}
+        sx={{ display: 'block', textAlign: 'initial', width: '100%' }}
       >
         <CardMedia
-          // component="img"
           image={
             post.selectedFile ||
             'https://user-images.githubusercontent.com/194400/49531010-48dad180-f8b1-11e8-8d89-1e61320e1d82.png'
@@ -107,40 +90,21 @@ const Post = ({ post, setCurrentId }) => {
           alt={post.title}
           sx={{
             height: 0,
-            paddingTop: '56.25%', // 16:9 aspect ratio
+            paddingTop: '56.25%',
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
             backgroundBlendMode: 'darken',
           }}
         />
 
-        {/* Overlay: Creator & Time */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 16,
-            left: 16,
-            color: 'white',
-          }}
-        >
-          <Typography variant="h6" component="div">
-            {post.name}
-          </Typography>
+        <Box sx={{ position: 'absolute', top: 16, left: 16, color: 'white' }}>
+          <Typography variant="h6">{post.name}</Typography>
           <Typography variant="body2">
             {moment(post.createdAt).fromNow()}
           </Typography>
         </Box>
 
-        {/* --- FIX 2: Check logged-in user's ID against the post creator --- */}
-        {/* 'userId' (from line 30) is the logged-in user's ID (Google or custom) */}
-        {/* 'post.creator' is the ID of the person who made the post */}
         {userId === post?.creator && (
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 8,
-              right: 8,
-            }}
-          >
+          <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
             <Button
               onClick={(e) => {
                 e.stopPropagation();
@@ -154,32 +118,20 @@ const Post = ({ post, setCurrentId }) => {
           </Box>
         )}
 
-        {/* Tags */}
         <Box sx={{ p: 2 }}>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            component="div"
-          >
+          <Typography variant="body2" color="text.secondary">
             {post.tags?.map((tag) => `#${tag} `)}
           </Typography>
         </Box>
 
-        {/* Title */}
         <Typography
           variant="h5"
           gutterBottom
-          sx={{
-            px: 2,
-            mt: -1,
-            fontWeight: 600,
-            color: 'text.primary',
-          }}
+          sx={{ px: 2, mt: -1, fontWeight: 600, color: 'text.primary' }}
         >
           {post.title}
         </Typography>
 
-        {/* Message Preview */}
         <CardContent sx={{ pt: 0, pb: 1, flexGrow: 1 }}>
           <Typography
             variant="body2"
@@ -197,32 +149,23 @@ const Post = ({ post, setCurrentId }) => {
         </CardContent>
       </ButtonBase>
 
-      {/* Actions */}
-      <CardActions
-        sx={{
-          px: 2,
-          pb: 2,
-          pt: 1,
-          justifyContent: 'space-between',
-        }}
-      >
+      <CardActions sx={{ px: 2, pb: 2, pt: 1, justifyContent: 'space-between' }}>
         <Button
           size="small"
           color="primary"
           disabled={!user?.result}
           onClick={handleLike}
-          startIcon={<Likes />}
-        />
+        >
+          <Likes />
+        </Button>
 
-        {/* --- FIX 3: Same logic for the Delete button --- */}
         {userId === post?.creator && (
           <Button
             size="small"
             color="secondary"
             onClick={() => dispatch(deletePost(post._id))}
-            startIcon={<DeleteIcon fontSize="small" />}
           >
-            Delete
+            <DeleteIcon fontSize="small" /> Delete
           </Button>
         )}
       </CardActions>

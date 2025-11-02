@@ -1,6 +1,5 @@
 import { START_LOADING, END_LOADING, FETCH_ALL, FETCH_POST, FETCH_BY_SEARCH, CREATE, UPDATE, DELETE, LIKE, COMMENT, FETCH_BY_CREATOR } from '../constants/actionTypes';
 
-// The state must be an OBJECT, with an initial 'posts' array inside it.
 const postsReducer = (state = { isLoading: true, posts: [] }, action) => {
   switch (action.type) {
     case START_LOADING:
@@ -32,9 +31,14 @@ const postsReducer = (state = { isLoading: true, posts: [] }, action) => {
     case LIKE:
       return {
         ...state,
-        posts: state.posts.map((post) => (post._id === action.payload._id ? action.payload : post)),
-        // This updates the single post object for the details page
-        post: action.payload._id === state.post?._id ? action.payload : state.post,
+        posts: state.posts.map((p) =>
+          p._id === action.payload._id
+            ? { ...p, likes: action.payload.likes || [] }
+            : p
+        ),
+        post: state.post?._id === action.payload._id
+          ? { ...state.post, likes: action.payload.likes || [] }
+          : state.post,
       };
       
     case COMMENT:

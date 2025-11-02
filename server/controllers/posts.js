@@ -146,28 +146,29 @@ export const deletePost = async (req, res) => {
 }
 
 export const likePost = async (req, res) => {
+  try {
     const { id } = req.params;
+    const { userId } = req; // From auth middleware
 
-    if (!req.userId) {
-        return res.json({ message: "Unauthenticated" });
-      }
+    if (!req.userId) return res.status(401).json({ message: 'Unauthenticated' });
 
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No post with id: ${id}`);
-    
     const post = await PostMessage.findById(id);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
 
-    const index = post.likes.findIndex((id) => id ===String(req.userId));
+    const index = post.likes.indexOf(userId);
 
     if (index === -1) {
-      post.likes.push(req.userId);
+      post.likes.push(userId); // Like
     } else {
-      post.likes = post.likes.filter((id) => id !== String(req.userId));
+      post.likes.splice(index, 1); // Unlike
     }
 
     const updatedPost = await PostMessage.findByIdAndUpdate(id, post, { new: true });
-
     res.status(200).json(updatedPost);
-}
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 export const commentPost = async (req, res) => {
   const { id } = req.params;
