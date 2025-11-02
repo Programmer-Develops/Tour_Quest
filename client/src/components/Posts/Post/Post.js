@@ -25,14 +25,16 @@ const Post = ({ post, setCurrentId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('profile'));
+  
+  // FIX 1: Only if user is logged in AND is the creator
+  const isLoggedIn = !!user?.result;
   const userId = user?.result?.googleId || user?.result?._id;
-
-  // SAFE: Always an array
+  const isOwner = isLoggedIn && userId === post?.creator;
   const likes = Array.isArray(post.likes) ? post.likes : [];
-  const hasLiked = likes.includes(userId);
+  const hasLiked = isLoggedIn && Array.isArray(post.likes) && post.likes.includes(userId);
 
   const handleLike = () => {
-    if (user?.token) {
+    if (isLoggedIn) {
       dispatch(likePost(post._id));
     }
   };
@@ -149,17 +151,19 @@ const Post = ({ post, setCurrentId }) => {
         </CardContent>
       </ButtonBase>
 
-      <CardActions sx={{ px: 2, pb: 2, pt: 1, justifyContent: 'space-between' }}>
+      <CardActions>
+        {/* FIX 2: Like button — only for logged-in users */}
         <Button
           size="small"
           color="primary"
-          disabled={!user?.result}
+          disabled={!isLoggedIn}
           onClick={handleLike}
         >
           <Likes />
         </Button>
 
-        {userId === post?.creator && (
+        {/* FIX 3: Delete button — only for OWNER */}
+        {isOwner && (
           <Button
             size="small"
             color="secondary"
