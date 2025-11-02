@@ -30,7 +30,7 @@ const Home = () => {
   const searchQuery = query.get('searchQuery');
 
   const [currentId, setCurrentId] = useState(null);
-  const { authData } = useSelector((state) => state.auth); // ← ADD THIS
+  const { authData } = useSelector((state) => state.auth); 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

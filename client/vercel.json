@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "REACT_APP_API_URL": "https://tour-quest.onrender.com/",
+    "REACT_APP_GOOGLE_CLIENT_ID": "424786950941-qch4e23cs0h4ftmdhrtu4aiv139o219a.apps.googleusercontent.com"
+  }
+}
