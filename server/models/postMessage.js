@@ -7,13 +7,14 @@ const postSchema = mongoose.Schema({
   creator: String,
   tags: [String],
   selectedFile: String,
-
-  // REPLACE likeCount & isLiked with:
   likes: {
-    type: [String], // Array of user IDs (Google ID or Mongo _id)
+    type: [String], 
     default: [],
   },
-
+  helpful: {
+    type: [String],
+    default: [],
+  },
   createdAt: {
     type: Date,
     default: new Date(),

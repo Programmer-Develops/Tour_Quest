@@ -9,6 +9,7 @@ import {
   UPDATE,
   DELETE,
   LIKE,
+  HELPFUL,
   COMMENT,
   FETCH_BY_CREATOR,
 } from '../constants/actionTypes';
@@ -136,6 +137,15 @@ export const likePost = (id) => async (dispatch, getState) => {
     dispatch({ type: LIKE, payload: data });
   } catch (error) {
     console.error('likePost error:', error);
+  }
+};
+
+export const helpfulPost = (id) => async (dispatch) => {
+  try {
+    const { data } = await api.helpfulPost(id);
+    dispatch({ type: HELPFUL, payload: data });
+  } catch (error) {
+    console.log(error);
   }
 };
 

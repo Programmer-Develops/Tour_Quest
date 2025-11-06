@@ -170,6 +170,31 @@ export const likePost = async (req, res) => {
   }
 };
 
+export const helpfulPost = async (req, res) => {
+  const id = req.params;
+  if(!req.userId) {
+    return res.json({ message: "Unauthenticated" });
+  }
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).send(`No post with id: ${id}`);
+  }
+
+  try {
+    const post = await PostMessage.findById(id);
+    const index = post.helpful.findIndex((id)=> id === String(req.userId));
+
+    if (index === -1) {
+      post.helpful.push(req.userId);
+    } else {
+      post.helpful = post.helpful.filter((id)=> id !== String(req.userId))
+    }
+    const updatedPost = await PostMessage.findByIdAndUpdate(id, post, { new: true });
+    res.status(200).json(updatedPost);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 export const commentPost = async (req, res) => {
   const { id } = req.params;
   const { value } = req.body;

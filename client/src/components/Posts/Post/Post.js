@@ -11,27 +11,34 @@ import {
 } from '@mui/material';
 import {
   ThumbUpAlt as ThumbUpAltIcon,
+  ThumbUpAltOutlined,
   Delete as DeleteIcon,
   MoreHoriz as MoreHorizIcon,
-  ThumbUpAltOutlined,
+  Help as HelpIcon,
+  HelpOutline as HelpOutlineIcon,
 } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
-import { likePost, deletePost } from '../../../actions/posts';
+import { likePost, deletePost, helpfulPost } from '../../../actions/posts';
 
 const Post = ({ post, setCurrentId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('profile'));
-  
-  // FIX 1: Only if user is logged in AND is the creator
-  const isLoggedIn = !!user?.result;
+
   const userId = user?.result?.googleId || user?.result?._id;
-  const isOwner = isLoggedIn && userId === post?.creator;
+  const isLoggedIn = !!user?.result; 
+
+
   const likes = Array.isArray(post.likes) ? post.likes : [];
-  const hasLiked = isLoggedIn && Array.isArray(post.likes) && post.likes.includes(userId);
+  const hasLiked = isLoggedIn && likes.includes(userId);
+
+  const helpfuls = Array.isArray(post.helpful) ? post.helpful : [];
+  const hasFoundHelpful = isLoggedIn && helpfuls.includes(userId);
+
+  const isOwner = isLoggedIn && userId === post?.creator;
 
   const handleLike = () => {
     if (isLoggedIn) {
@@ -39,12 +46,25 @@ const Post = ({ post, setCurrentId }) => {
     }
   };
 
+  const handleHelpful = () => {
+    if (isLoggedIn) {
+      dispatch(helpfulPost(post._id));
+    }
+  };
+
+  const openPost = () => {
+    navigate(`/posts/${post._id}`);
+  };
+
   const Likes = () => {
     if (likes.length > 0) {
       return hasLiked ? (
         <>
           <ThumbUpAltIcon fontSize="small" />
-          &nbsp;{likes.length > 2 ? `You and ${likes.length - 1} others` : `${likes.length} like${likes.length > 1 ? 's' : ''}`}
+          &nbsp;
+          {likes.length > 2
+            ? `You and ${likes.length - 1} others`
+            : `${likes.length} like${likes.length > 1 ? 's' : ''}`}
         </>
       ) : (
         <>
@@ -61,8 +81,28 @@ const Post = ({ post, setCurrentId }) => {
     );
   };
 
-  const openPost = () => {
-    navigate(`/posts/${post._id}`);
+  const Helpfuls = () => {
+    if (helpfuls.length === 0) {
+      return (
+        <>
+          <HelpOutlineIcon fontSize="small" />
+          &nbsp;Helpful
+        </>
+      );
+    }
+
+    const Icon = hasFoundHelpful ? HelpIcon : HelpOutlineIcon;
+    
+    const text = helpfuls.length === 1 
+                   ? '1 person found this helpful' 
+                   : `${helpfuls.length} people found this helpful`;
+
+    return (
+      <>
+        <Icon fontSize="small" />
+        &nbsp;{text}
+      </>
+    );
   };
 
   return (
@@ -105,11 +145,11 @@ const Post = ({ post, setCurrentId }) => {
           </Typography>
         </Box>
 
-        {userId === post?.creator && (
+        {isOwner && (
           <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
             <Button
               onClick={(e) => {
-                e.stopPropagation();
+                e.stopPropagation(); // Don't trigger openPost
                 setCurrentId(post._id);
               }}
               size="small"
@@ -151,25 +191,34 @@ const Post = ({ post, setCurrentId }) => {
         </CardContent>
       </ButtonBase>
 
-      <CardActions>
-        {/* FIX 2: Like button — only for logged-in users */}
-        <Button
-          size="small"
-          color="primary"
-          disabled={!isLoggedIn}
-          onClick={handleLike}
-        >
-          <Likes />
-        </Button>
+      <CardActions sx={{ justifyContent: 'space-between' }}>
+        <Box> 
+          <Button
+            size="small"
+            color="primary"
+            disabled={!isLoggedIn}
+            onClick={handleLike}
+          >
+            <Likes />
+          </Button>
 
-        {/* FIX 3: Delete button — only for OWNER */}
+          <Button
+            size="small"
+            color="primary"
+            disabled={!isLoggedIn}
+            onClick={handleHelpful}
+          >
+            <Helpfuls />
+          </Button>
+        </Box>
+
         {isOwner && (
           <Button
             size="small"
             color="secondary"
             onClick={() => dispatch(deletePost(post._id))}
           >
-            <DeleteIcon fontSize="small" /> Delete
+            <DeleteIcon fontSize="small" /> &nbsp;Delete
           </Button>
         )}
       </CardActions>

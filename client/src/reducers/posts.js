@@ -1,4 +1,4 @@
-import { START_LOADING, END_LOADING, FETCH_ALL, FETCH_POST, FETCH_BY_SEARCH, CREATE, UPDATE, DELETE, LIKE, COMMENT, FETCH_BY_CREATOR } from '../constants/actionTypes';
+import { START_LOADING, END_LOADING, FETCH_ALL, FETCH_POST, FETCH_BY_SEARCH, CREATE, UPDATE, DELETE, LIKE, HELPFUL, COMMENT, FETCH_BY_CREATOR } from '../constants/actionTypes';
 
 const postsReducer = (state = { isLoading: true, posts: [] }, action) => {
   switch (action.type) {
@@ -39,6 +39,13 @@ const postsReducer = (state = { isLoading: true, posts: [] }, action) => {
         post: state.post?._id === action.payload._id
           ? { ...state.post, likes: action.payload.likes || [] }
           : state.post,
+      };
+    
+    case HELPFUL:
+      return {
+        ...state,
+        posts: state.posts.map((post) => (post._id === action.payload._id ? action.payload : post)),
+        post: action.payload._id === state.post?._id ? { ...action.payload } : state.post,
       };
       
     case COMMENT:
