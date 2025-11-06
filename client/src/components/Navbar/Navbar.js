@@ -73,7 +73,7 @@ const Navbar = () => {
             >
               {user.result.name.charAt(0).toUpperCase()}
             </Avatar>
-            <Typography variant="h6" sx={{ display: { xs: 'none', sm: 'block' }, fontWeight: 500 }}>
+            <Typography variant="h6" sx={{ display: { xs: 'none', sm: 'block' }, fontWeight: 500, color:'black' }}>
               {user.result.name}
             </Typography>
             <Button variant="contained" color="secondary" onClick={logout} size="small" sx={{ textTransform: 'none' }}>
