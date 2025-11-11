@@ -66,6 +66,9 @@ const Navbar = () => {
       <Box>
         {user?.result ? (
           <Stack direction="row" alignItems="center" spacing={2} sx={{ pr: { xs: 0, sm: 2 } }}>
+            <Button component={Link} to = "https://virtual-tour-vert.vercel.app/" variant="contained" color="primary" size="small" sx={{ textTransform: 'none' }}>
+              VR
+            </Button>
             <Avatar
               sx={{ bgcolor: 'primary.main', width: 40, height: 40, fontSize: '1rem' }}
               alt={user.result.name}
@@ -73,6 +76,7 @@ const Navbar = () => {
             >
               {user.result.name.charAt(0).toUpperCase()}
             </Avatar>
+            
             <Typography variant="h6" sx={{ display: { xs: 'none', sm: 'block' }, fontWeight: 500, color:'black' }}>
               {user.result.name}
             </Typography>
