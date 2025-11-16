@@ -1,4 +1,3 @@
-// client/src/actions/posts.js
 import {
   START_LOADING,
   END_LOADING,

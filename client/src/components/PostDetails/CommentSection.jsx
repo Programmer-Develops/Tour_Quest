@@ -14,7 +14,6 @@ import { commentPost } from '../../actions/posts';
 const CommentSection = ({ post }) => {
   const user = JSON.parse(localStorage.getItem('profile'));
   const [comment, setComment] = useState('');
-  // 1. We use a local state to store and show the comments.
   const [comments, setComments] = useState(post?.comments || []);
   const dispatch = useDispatch();
   const commentsRef = useRef();

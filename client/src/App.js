@@ -17,21 +17,16 @@ const App = () => {
       <Container maxWidth="xl">
         <Navbar />
         <Routes>
-          {/* Redirect root to /posts */}
           <Route path="/" element={<Navigate to="/posts" replace />} />
 
-          {/* Home page */}
           <Route path="/posts" element={<Home />} />
           <Route path="/posts/search" element={<Home />} />
 
-          {/* Post Details */}
           <Route path="/posts/:id" element={<PostDetails />} />
 
-          {/* Creator or Tag page */}
           <Route path="/creators/:name" element={<CreatorOrTag />} />
           <Route path="/tags/:name" element={<CreatorOrTag />} />
 
-          {/* Auth Guard */}
           <Route
             path="/auth"
             element={authData ? <Navigate to="/posts" replace /> : <Auth />}

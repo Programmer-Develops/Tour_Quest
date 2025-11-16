@@ -10,7 +10,7 @@ export const getPosts = async (req, res) => {
     
     try {
         const LIMIT = 8;
-        const startIndex = (Number(page) - 1) * LIMIT; // get the starting index of every page
+        const startIndex = (Number(page) - 1) * LIMIT; 
     
         const total = await PostMessage.countDocuments({});
         const posts = await PostMessage.find().sort({ _id: -1 }).limit(LIMIT).skip(startIndex);
@@ -62,7 +62,6 @@ export const getPost = async (req, res) => {
 export const createPost = async (req, res) => {
   const post = req.body;
 
-  // This line MUST use req.userId, not post.name or anything else
   const newPostMessage = new PostMessage({ ...post, creator: req.userId, createdAt: new Date().toISOString() });
 
   try {
@@ -75,31 +74,26 @@ export const createPost = async (req, res) => {
 
 export const updatePost = async (req, res) => {
   const { id } = req.params;
-  const postData = req.body; // Contains title, message, tags, etc.
+  const postData = req.body; 
 
-  // 1. Check if user is authenticated
   if (!req.userId) {
     return res.status(401).json({ message: "Unauthenticated" });
   }
 
-  // 2. Check for a valid ID
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(404).send(`No post with id: ${id}`);
   }
 
   try {
-    // 3. Find the post
     const post = await PostMessage.findById(id);
     if (!post) {
       return res.status(404).send(`No post with id: ${id}`);
     }
 
-    // 4. Check if the authenticated user is the creator
     if (String(post.creator) !== String(req.userId)) {
       return res.status(403).json({ message: "Forbidden: You do not have permission to edit this post." });
     }
-
-    // 5. If all checks pass, update the post
+    
     const updatedPost = await PostMessage.findByIdAndUpdate(id, postData, { new: true });
     
     res.json(updatedPost);
@@ -112,30 +106,25 @@ export const updatePost = async (req, res) => {
 export const deletePost = async (req, res) => {
     const { id } = req.params;
 
-    // 1. Check if user is authenticated
     if (!req.userId) {
         return res.status(401).json({ message: "Unauthenticated" });
     }
 
-    // 2. Check if the ID is a valid Mongoose ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(404).send(`No post with id: ${id}`);
     }
 
     try {
-        // 3. Find the post to get the creator's ID
         const post = await PostMessage.findById(id);
 
         if (!post) {
             return res.status(404).send(`No post with id: ${id}`);
         }
 
-        // 4. Check if the authenticated user is the creator
         if (String(post.creator) !== String(req.userId)) {
             return res.status(403).json({ message: "Forbidden: You do not have permission to delete this post." });
         }
 
-        // 5. If all checks pass, delete the post
         await PostMessage.findByIdAndDelete(id);
 
         res.json({ message: "Post deleted successfully." });
@@ -148,7 +137,7 @@ export const deletePost = async (req, res) => {
 export const likePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId } = req; // From auth middleware
+    const { userId } = req; 
 
     if (!req.userId) return res.status(401).json({ message: 'Unauthenticated' });
 
@@ -158,9 +147,9 @@ export const likePost = async (req, res) => {
     const index = post.likes.indexOf(userId);
 
     if (index === -1) {
-      post.likes.push(userId); // Like
+      post.likes.push(userId); 
     } else {
-      post.likes.splice(index, 1); // Unlike
+      post.likes.splice(index, 1); 
     }
 
     const updatedPost = await PostMessage.findByIdAndUpdate(id, post, { new: true });
@@ -171,21 +160,17 @@ export const likePost = async (req, res) => {
 };
 
 export const helpfulPost = async (req, res) => {
-  // --- THIS IS THE FIX ---
-  // We destructure 'id' from the 'req.params' object
   const { id } = req.params; 
 
   if (!req.userId) {
     return res.json({ message: "Unauthenticated" });
   }
 
-  // Now 'id' is a string, so this check will work
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(404).send(`No post with id: ${id}`);
   }
 
   try {
-    // And this 'findById' will work
     const post = await PostMessage.findById(id); 
     
     if (!post) {
@@ -204,7 +189,7 @@ export const helpfulPost = async (req, res) => {
     res.status(200).json(updatedPost);
 
   } catch (error) {
-    console.log("HELPFUL POST ERROR: ", error); // Added for better logging
+    console.log("HELPFUL POST ERROR: ", error); 
     res.status(500).json({ message: "Something went wrong." });
   }
 }
@@ -214,22 +199,16 @@ export const commentPost = async (req, res) => {
   const { value } = req.body;
 
   try {
-    // This is the new, safer logic.
-    // It finds the post by 'id', uses MongoDB's '$push' operator
-    // to add the 'value' to the 'comments' array, and
-    // '{ new: true }' ensures it returns the *updated* post.
+
     const updatedPost = await PostMessage.findByIdAndUpdate(
       id,
       { $push: { comments: value } },
       { new: true }
     );
 
-    // If the post doesn't exist (e.g., bad ID)
     if (!updatedPost) {
       return res.status(404).json({ message: "Post not found." });
     }
-
-    // Send the updated post back to the frontend
     res.status(200).json(updatedPost);
 
   } catch (error) {

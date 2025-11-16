@@ -138,7 +138,6 @@ const Home = () => {
                 </Button>
               </AppBar>
 
-              {/* Form - Only if logged in */}
               {authData && <Form currentId={currentId} setCurrentId={setCurrentId} />}
 
               <Box sx={{ mt: 'auto' }}>

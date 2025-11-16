@@ -42,15 +42,12 @@ const Form = ({ currentId, setCurrentId }) => {
     if (post) setPostData(post);
   }, [post]);
 
-  // THIS IS THE NEW, CORRECT CODE
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (currentId) {
-      // Also add the name to updated posts
       dispatch(updatePost(currentId, { ...postData, name: user?.result?.name }));
     } else {
-      // Add the user's name when creating a post
       dispatch(createPost({ ...postData, name: user?.result?.name }, navigate));
     }
     clear();
@@ -124,7 +121,6 @@ const Form = ({ currentId, setCurrentId }) => {
           size="small"
         />
 
-        {/* Tags Input */}
         <Autocomplete
           multiple
           freeSolo
@@ -157,7 +153,6 @@ const Form = ({ currentId, setCurrentId }) => {
           )}
         />
 
-        {/* File Upload */}
         <Box
           sx={{
             p: 2,
@@ -181,7 +176,6 @@ const Form = ({ currentId, setCurrentId }) => {
           />
         </Box>
 
-        {/* Buttons */}
         <Stack direction="row" spacing={1}>
           <Button
             variant="contained"

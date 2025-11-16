@@ -203,7 +203,6 @@ const Auth = () => {
               </Typography>
             </Box>
 
-            {/* Google Login Button */}
             <GoogleLogin
               onSuccess={googleSuccess}
               onError={googleError}

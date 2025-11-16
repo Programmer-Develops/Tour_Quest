@@ -8,14 +8,12 @@ import { reducers } from './reducers';
 import App from './App';
 import './index.css';
 
-// Modern store with configureStore
 const store = configureStore({
   reducer: reducers,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(thunk),
 });
 
-// React 18+ root API
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>

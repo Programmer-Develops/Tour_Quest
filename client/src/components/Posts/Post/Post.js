@@ -31,7 +31,6 @@ const Post = ({ post, setCurrentId }) => {
   const userId = user?.result?.googleId || user?.result?._id;
   const isLoggedIn = !!user?.result; 
 
-
   const likes = Array.isArray(post.likes) ? post.likes : [];
   const hasLiked = isLoggedIn && likes.includes(userId);
 

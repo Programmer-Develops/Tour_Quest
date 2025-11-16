@@ -51,14 +51,12 @@ const postsReducer = (state = { isLoading: true, posts: [] }, action) => {
     case COMMENT:
       return {
         ...state,
-        // This updates the post in the main 'posts' array
         posts: state.posts.map((post) => {
           if (post._id === action.payload._id) {
             return action.payload; 
           }
           return post;
         }),
-        // This updates the single 'post' object for the details page
         post: action.payload,
       };
 
@@ -72,7 +70,6 @@ const postsReducer = (state = { isLoading: true, posts: [] }, action) => {
       return {
         ...state,
         posts: state.posts.map((post) => (post._id === action.payload._id ? action.payload : post)),
-        // This updates the single post object for the details page
         post: action.payload._id === state.post?._id ? action.payload : state.post,
       };
 
@@ -80,7 +77,6 @@ const postsReducer = (state = { isLoading: true, posts: [] }, action) => {
       return {
         ...state,
         posts: state.posts.filter((post) => post._id !== action.payload),
-        // This clears the post if the deleted one was being viewed
         post: action.payload === state.post?._id ? null : state.post,
       };
 

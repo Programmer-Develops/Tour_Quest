@@ -14,7 +14,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { getPost, getPostsBySearch } from '../../actions/posts';
 import CommentSection from './CommentSection';
-
 const PostDetails = () => {
   const { post, posts, isLoading } = useSelector((state) => state.posts);
   const dispatch = useDispatch();
@@ -64,7 +63,6 @@ const PostDetails = () => {
           gap: 3,
         }}
       >
-        {/* Left Section - Content */}
         <Box sx={{ flex: 1 }}>
           <Typography variant="h3" component="h2" gutterBottom>
             {post.title}
@@ -120,7 +118,6 @@ const PostDetails = () => {
           <Divider sx={{ my: 2 }} />
         </Box>
 
-        {/* Right Section - Image */}
         <Box
           sx={{
             flex: 1,
@@ -147,7 +144,6 @@ const PostDetails = () => {
         </Box>
       </Box>
 
-      {/* Recommended Posts */}
       {!!recommendedPosts?.length && (
         <Box sx={{ mt: 4 }}>
           <Typography gutterBottom variant="h5">

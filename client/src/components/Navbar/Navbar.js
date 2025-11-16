@@ -25,12 +25,10 @@ const Navbar = () => {
     navigate('/auth');
   }, [dispatch, navigate]);
 
-  // Sync user with Redux state
   useEffect(() => {
     setUser(authData);
   }, [authData]);
 
-  // Check token expiration
   useEffect(() => {
     const token = user?.token;
     if (token) {
@@ -44,7 +42,7 @@ const Navbar = () => {
         logout();
       }
     }
-  }, [user?.token, logout]); // ← Only these deps
+  }, [user?.token, logout]); 
 
   return (
     <AppBar
